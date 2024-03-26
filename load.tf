@@ -1,8 +1,7 @@
-# Provider configuration
 provider "google" {
   project = "jagriti-411012"
    credentials = "${file("C:/Users/JAGRITI/Downloads/jagriti-411012-f2cd08035bac.json")}"
-#   region  = "us-central1"
+
 }
 
 # Create VPC network
