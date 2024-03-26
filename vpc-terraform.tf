@@ -1,10 +1,3 @@
-# Provider configuration
-# provider "google" {
-#   project = "your-project-id"
-#   region  = "us-central1"
-# }
-
-# # Create VPC network
 resource "google_compute_network" "my_network" {
   name                    = "my-vpc-terraform"
   auto_create_subnetworks = false
@@ -72,7 +65,7 @@ resource "google_compute_instance" "private_vm2" {
     subnetwork = google_compute_subnetwork.private_subnet2.self_link
     access_config {}
   }
-  # Add other configurations as needed
+ 
 }
 
 resource "google_compute_instance" "public_vm3" {
@@ -89,7 +82,7 @@ resource "google_compute_instance" "public_vm3" {
     subnetwork = google_compute_subnetwork.public_subnet1.self_link
     access_config {}
   }
-  # Add other configurations as needed
+ 
 }
 
 resource "google_compute_instance" "public_vm2" {
