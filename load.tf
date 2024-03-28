@@ -1,7 +1,7 @@
+# Provider configuration
 provider "google" {
-  project = "jagriti-411012"
-   credentials = "${file("C:/Users/JAGRITI/Downloads/jagriti-411012-f2cd08035bac.json")}"
-
+  project     = "jagriti-411012"
+  credentials = file("C:/Users/JAGRITI/Downloads/jagriti-411012-f2cd08035bac.json")
 }
 
 # Create VPC network
@@ -11,10 +11,11 @@ resource "google_compute_network" "my_network1" {
 
 # Create subnets
 resource "google_compute_subnetwork" "private_subnet" {
-  name          = "private-subnet"
-  region        = "us-central1"
-  network       = google_compute_network.my_network1.self_link
-  ip_cidr_range = "10.0.1.0/24"
+  name                    = "private-subnet"
+  region                  = "us-central1"
+  network                 = google_compute_network.my_network1.self_link
+  ip_cidr_range           = "10.0.1.0/24"
+  private_ip_google_access = true
 }
 
 resource "google_compute_subnetwork" "public_subnet" {
@@ -25,7 +26,7 @@ resource "google_compute_subnetwork" "public_subnet" {
 }
 
 # Create firewall rules
-resource "google_compute_firewall" "allow_http" {
+resource "google_compute_firewall" "allow_http1" {
   name    = "terraform-loadbalancer"
   network = google_compute_network.my_network1.name
 
@@ -37,7 +38,7 @@ resource "google_compute_firewall" "allow_http" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-# Create VM instances
+# Create VM instances with startup script to install Nginx
 resource "google_compute_instance" "private_vm" {
   count        = 2
   name         = "private-vm-${count.index}"
@@ -48,11 +49,13 @@ resource "google_compute_instance" "private_vm" {
       image = "debian-cloud/debian-10"
     }
   }
+
   network_interface {
-    network = google_compute_network.my_network1.self_link
+    network    = google_compute_network.my_network1.self_link
     subnetwork = google_compute_subnetwork.private_subnet.self_link
-    access_config {}
   }
+# tags = [google_compute_firewall.allow_http1.name]
+  metadata_startup_script = file("script.sh")
 }
 
 resource "google_compute_instance" "public_vm" {
@@ -65,11 +68,15 @@ resource "google_compute_instance" "public_vm" {
       image = "debian-cloud/debian-10"
     }
   }
+
   network_interface {
-    network = google_compute_network.my_network1.self_link
+    network    = google_compute_network.my_network1.self_link
     subnetwork = google_compute_subnetwork.public_subnet.self_link
     access_config {}
   }
+  # tags = [google_compute_firewall.allow_http1.name]
+
+  metadata_startup_script = file("script.sh")
 }
 
 # Create target pool
