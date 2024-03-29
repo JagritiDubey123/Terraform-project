@@ -40,7 +40,7 @@ resource "google_storage_bucket_object" "index" {
       </body>
     </html>
   EOT
-# acl = "public-read"
+
 }
 
 # resource "google_storage_bucket_object" "not_found" {
@@ -50,5 +50,4 @@ resource "google_storage_bucket_object" "index" {
 # }
 output "website_url" {
   value = "http://storage.googleapis.com/${google_storage_bucket.static_bucket.name}/index.html"
-#   https://storage.googleapis.com/static-website-bucket-jagriti/index.html
 }
